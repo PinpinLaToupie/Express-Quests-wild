@@ -1,9 +1,11 @@
+// userControllers.js
+
 const database = require("./database");
 
 const getUsers = async (req, res) => {
   try {
     const [users] = await database.query("SELECT * FROM users");
-    res.status(200).json(users);
+    res.json(users);
   } catch (error) {
     console.error(error);
     res.sendStatus(500);
@@ -11,23 +13,47 @@ const getUsers = async (req, res) => {
 };
 
 const getUserById = async (req, res) => {
-    const userId = parseInt(req.params.id);
-  
-    try {
-      const [user] = await database.query("SELECT * FROM users WHERE id = ?", [userId]);
-  
-      if (user.length > 0) {
-        res.status(200).json(user[0]);
-      } else {
-        res.status(404).json({ message: "User not found" });
-      }
-    } catch (error) {
-      console.error(error);
-      res.sendStatus(500);
+  const id = parseInt(req.params.id);
+
+  try {
+    const [users] = await database.query("SELECT * FROM users WHERE id = ?", [id]);
+
+    if (users.length > 0) {
+      res.json(users[0]);
+    } else {
+      res.sendStatus(404);
     }
-  };
-  
-  module.exports = {
-    getUsers,
-    getUserById,
-  };
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+};
+
+const postUser = async (req, res) => {
+  const { firstname, lastname, email, city, language } = req.body;
+
+  if (!firstname || !lastname || !email) {
+    return res.status(400).json({ message: "Firstname, lastname, and email are required." });
+  }
+
+  try {
+    const result = await database.query(
+      "INSERT INTO users (firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
+      [firstname, lastname, email, city, language]
+    );
+
+    const insertedUserId = result[0].insertId;
+    const [insertedUser] = await database.query("SELECT * FROM users WHERE id = ?", [insertedUserId]);
+
+    res.status(201).json(insertedUser[0]);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
+};
+
+module.exports = {
+  getUsers,
+  getUserById,
+  postUser,
+};

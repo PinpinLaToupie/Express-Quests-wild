@@ -41,7 +41,9 @@ const getMovieById = async (req, res) => {
   const id = parseInt(req.params.id);
 
   try {
-    const [movies] = await database.query("SELECT * FROM movies WHERE id = ?", [id]);
+    const [movies] = await database.query("SELECT * FROM movies WHERE id = ?", [
+      id,
+    ]);
 
     if (movies.length > 0) {
       res.json(movies[0]);
@@ -54,9 +56,39 @@ const getMovieById = async (req, res) => {
   }
 };
 
+const postMovie = (req, res) => {
+  const { title, director, year, color, duration } = req.body;
+
+  database
+    .query(
+      "INSERT INTO movies(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
+      [title, director, year, color, duration]
+    )
+    .then(([result]) => {
+      res.status(201).send({ id: result.insertId });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(500);
+    });
+};
+
 module.exports = {
   getMovies,
   getMovieById,
+  postMovie,
 };
 
+const express = require("express");
+const app = express();
 
+const movieControllers = require("../controllers/movieControllers");
+
+app.get("/api/movies", movieControllers.getMovies);
+app.get("/api/movies/:id", movieControllers.getMovieById);
+app.post("/api/movies", movieControllers.postMovie);
+
+const port = 5000;
+app.listen(port, () => {
+  console.log(`The server operates on the ${port}`);
+});
