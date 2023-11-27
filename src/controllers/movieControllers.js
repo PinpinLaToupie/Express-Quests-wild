@@ -25,19 +25,32 @@ const movies = [
   },
 ];
 
-const getMovies = (req, res) => {
-  res.json(movies);
+const database = require("./database");
+
+const getMovies = async (req, res) => {
+  try {
+    const [movies] = await database.query("SELECT * FROM movies");
+    res.json(movies);
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
+  }
 };
 
-const getMovieById = (req, res) => {
+const getMovieById = async (req, res) => {
   const id = parseInt(req.params.id);
 
-  const movie = movies.find((movie) => movie.id === id);
+  try {
+    const [movies] = await database.query("SELECT * FROM movies WHERE id = ?", [id]);
 
-  if (movie != null) {
-    res.json(movie);
-  } else {
-    res.status(404).send("Not Found");
+    if (movies.length > 0) {
+      res.json(movies[0]);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.error(error);
+    res.sendStatus(500);
   }
 };
 
@@ -45,3 +58,5 @@ module.exports = {
   getMovies,
   getMovieById,
 };
+
+
