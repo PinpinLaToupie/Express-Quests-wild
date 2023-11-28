@@ -14,5 +14,8 @@ app.get("/api/movies/:id", movieControllers.getMovieById);
 app.get("/api/users", userControllers.getUsers);
 app.get("/api/users/:id", userControllers.getUserById);
 app.use(express.json());
+app.put("/api/movies/:id", movieControllers.updateMovie);
+app.put("/api/users/:id", userControllers.updateUser);
 
 module.exports = app;
+

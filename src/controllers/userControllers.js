@@ -1,5 +1,3 @@
-// userControllers.js
-
 const database = require("./database");
 
 const getUsers = async (req, res) => {
@@ -16,7 +14,9 @@ const getUserById = async (req, res) => {
   const id = parseInt(req.params.id);
 
   try {
-    const [users] = await database.query("SELECT * FROM users WHERE id = ?", [id]);
+    const [users] = await database.query("SELECT * FROM users WHERE id = ?", [
+      id,
+    ]);
 
     if (users.length > 0) {
       res.json(users[0]);
@@ -33,7 +33,9 @@ const postUser = async (req, res) => {
   const { firstname, lastname, email, city, language } = req.body;
 
   if (!firstname || !lastname || !email) {
-    return res.status(400).json({ message: "Firstname, lastname, and email are required." });
+    return res
+      .status(400)
+      .json({ message: "Firstname, lastname, and email are required." });
   }
 
   try {
@@ -43,7 +45,10 @@ const postUser = async (req, res) => {
     );
 
     const insertedUserId = result[0].insertId;
-    const [insertedUser] = await database.query("SELECT * FROM users WHERE id = ?", [insertedUserId]);
+    const [insertedUser] = await database.query(
+      "SELECT * FROM users WHERE id = ?",
+      [insertedUserId]
+    );
 
     res.status(201).json(insertedUser[0]);
   } catch (error) {
@@ -52,8 +57,31 @@ const postUser = async (req, res) => {
   }
 };
 
+const updateUser = (req, res) => {
+  const id = parseInt(req.params.id);
+  const { firstname, lastname, email, city, language } = req.body;
+
+  database
+    .query(
+      "update users set firstname = ?, lastname = ?, email = ?, city = ?, language = ? where id = ?",
+      [firstname, lastname, email, city, language]
+    )
+    .then(([result]) => {
+      if (result.affectedRows === 0) {
+        res.sendStatus(404);
+      } else {
+        res.sendStatus(204);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.sendStatus(500);
+    });
+};
+
 module.exports = {
   getUsers,
   getUserById,
   postUser,
+  updateUser,
 };
