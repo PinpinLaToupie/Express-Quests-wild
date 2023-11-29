@@ -13,6 +13,15 @@ describe("GET /api/users", () => {
     expect(response.headers["content-type"]).toMatch(/json/);
     expect(response.status).toEqual(200);
   });
+  it("should return an error", async () => {
+    const userWithMissingProps = { title: "Harry" };
+
+    const response = await request(app)
+      .post("/api/users")
+      .send(userWithMissingProps);
+
+    expect(response.status).toEqual(422);
+  });
 });
 
 describe("PUT /api/users/:id", () => {
