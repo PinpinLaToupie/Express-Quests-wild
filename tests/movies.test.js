@@ -111,3 +111,17 @@ describe("PUT /api/movies/:id", () => {
     expect(response.status).toEqual(404);
   });
 });
+
+describe("DELETE /api/movies/:id", () => {
+  test("should delete a movie with a valid ID and return 204", async () => {
+    const response = await request(app).delete("/api/movies/1");
+
+    expect(response.status).toBe(204);
+  });
+
+  test("should return 404 for a non-existing movie ID", async () => {
+    const response = await request(app).delete("/api/movies/999");
+
+    expect(response.status).toBe(404);
+  });
+});

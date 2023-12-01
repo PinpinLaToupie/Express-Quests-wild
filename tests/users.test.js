@@ -30,7 +30,7 @@ describe("PUT /api/users/:id", () => {
       firstname: "Raoul",
       lastname: "Paul",
       email: "raoul.paul@example.com",
-      city: "Rio de Jainero",
+      city: "Rio de Janeiro",
       language: "Portuguese",
     };
 
@@ -68,19 +68,19 @@ describe("PUT /api/users/:id", () => {
     expect(userInDatabase).toHaveProperty("id");
 
     expect(userInDatabase).toHaveProperty("firstname");
-    expect(userInDatabase.firstname).toStrictEqual(updateduser.firstname);
+    expect(userInDatabase.firstname).toStrictEqual(updatedUser.firstname);
 
     expect(userInDatabase).toHaveProperty("lastname");
-    expect(userInDatabase.lastname).toStrictEqual(updateduser.lastname);
+    expect(userInDatabase.lastname).toStrictEqual(updatedUser.lastname);
 
     expect(userInDatabase).toHaveProperty("email");
-    expect(userInDatabase.email).toStrictEqual(updateduser.email);
+    expect(userInDatabase.email).toStrictEqual(updatedUser.email);
 
     expect(userInDatabase).toHaveProperty("city");
-    expect(userInDatabase.city).toStrictEqual(updateduser.city);
+    expect(userInDatabase.city).toStrictEqual(updatedUser.city);
 
     expect(userInDatabase).toHaveProperty("language");
-    expect(userInDatabase.language).toStrictEqual(updateduser.language);
+    expect(userInDatabase.language).toStrictEqual(updatedUser.language);
   });
 
   it("should return an error", async () => {
@@ -94,16 +94,30 @@ describe("PUT /api/users/:id", () => {
   });
 
   it("should return no user", async () => {
-    const newuser = {
-      firstname: "Raoul",
-      lastname: "Paul",
-      email: "raoul.paul@example.com",
-      city: "Rio de Jainero",
-      language: "Portuguese",
+    const newUser = {
+      firstname: "Je",
+      lastname: "Ne",
+      email: "suis@example.com",
+      city: "Pas",
+      language: "La",
     };
 
-    const response = await request(app).put("/api/users/0").send(newuser);
+    const response = await request(app).put("/api/users/0").send(newUser);
 
     expect(response.status).toEqual(404);
+  });
+});
+
+describe("DELETE /api/users/:id", () => {
+  test("should delete a user with a valid ID and return 204", async () => {
+    const response = await request(app).delete("/api/users/1");
+
+    expect(response.status).toBe(204);
+  });
+
+  test("should return 404 for a non-existing user ID", async () => {
+    const response = await request(app).delete("/api/users/999");
+
+    expect(response.status).toBe(404);
   });
 });
